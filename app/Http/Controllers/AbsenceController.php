@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Absence;
 use Illuminate\Http\Request;
+use App\Utils\ResultResponse;
 
 class AbsenceController extends Controller
 {
@@ -14,7 +15,12 @@ class AbsenceController extends Controller
      */
     public function index()
     {
-        //
+        $absences = Absence::all();
+        $resultResponse = new ResultResponse();
+        $resultResponse->setData($absences);
+        $resultResponse->setStatusCode(ResultResponse::SUCCESS_CODE);
+        $resultResponse->setMessage(ResultResponse::TXT_SUCCESS_CODE);
+        return response()->json($resultResponse);
     }
 
     /**
