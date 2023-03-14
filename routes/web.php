@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthorizationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('login', [AuthorizationController::class, 'index'])->name('login');
+Route::post('post-login', [AuthorizationController::class, 'postLogin'])->name('login.post'); 
+Route::get('registration', [AuthorizationController::class, 'registration'])->name('register');
+Route::post('post-registration', [AuthorizationController::class, 'postRegistration'])->name('register.post'); 
+Route::get('dashboard', [AuthorizationController::class, 'dashboard']); 
+Route::get('logout', [AuthorizationController::class, 'logout'])->name('logout');
