@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Absence;
 use Illuminate\Http\Request;
 use App\Utils\ResultResponse;
+use Validator;
 
 class AbsenceController extends Controller
 {
@@ -41,7 +42,35 @@ class AbsenceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validateAbsence($request);
+        $resultResponse = new ResultResponse();
+        try{
+            $newAbsence = new Absence(
+                [
+                    'abs_description'=>$request->get('abs_description'),
+                    'abs_referable'=>$request->get('abs_referable')
+                ]
+                );
+            $newAbsence->save();
+            $resultResponse->setData($newAbsence);
+            $resultResponse->setStatusCode(ResultResponse::SUCCESS_CODE);
+            $resultResponse->setMessage(ResultResponse::TXT_SUCCESS_CODE);
+        } catch(\Exception $ex){
+            $resultResponse->setStatusCode(ResultResponse::ERROR_CODE);
+            $resultResponse->setMessage(ResultResponse::TXT_ERROR_CODE);
+        }
+        return response()->json($resultResponse);
+    }
+
+    private function validateAbsence($request){
+        $rules = [];
+        $messages = [];
+        $rules['abs_description']='required|min:5|max:60';
+        $messages['abs_description.required'] = 'La descripción de la ausencia es obligatoria';
+        $rules['abs_referable']='required';
+        $messages['abs_referable.required'] = 'El campo para indicar si es referible es obligatorio';
+
+        return Validator::make($request->all(), $rules, $messages);
     }
 
     /**
