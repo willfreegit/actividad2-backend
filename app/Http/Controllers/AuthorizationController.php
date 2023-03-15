@@ -93,12 +93,6 @@ class AuthorizationController extends Controller
             ->withErrors($validator)
             ->withInput();
         }
-        $validatorDNI = $this->validateDNI($request);
-        if($validatorDNI->fails()) {
-            return redirect()->back()
-            ->withErrors($validatorDNI)
-            ->withInput();
-        }
         $data = $request->all();
         $this->create($data);
          
@@ -110,10 +104,6 @@ class AuthorizationController extends Controller
         $validator = $this->validateRegister($request);
         if($validator->fails()) {
             return response()->json($validator->messages(), 200);
-        }
-        $validatorDNI = $this->validateDNI($request);
-        if($validatorDNI->fails()) {
-            return response()->json($validatorDNI->messages(), 200);
         }
         $data = $request->all();
         $this->create($data);
@@ -139,6 +129,33 @@ class AuthorizationController extends Controller
         $messages['DNI.required'] = 'DNI requerido';
         $messages['DNI.min'] = 'DNI debe ser de tamaño 9 caracteres';
         $messages['DNI.max'] = 'DNI debe ser de tamaño 9 caracteres';
+        
+        $dni_ok = false;
+        $dni = $request->input('DNI');
+        try{
+            $pattern = "/^[XYZ]?\d{5,8}[A-Z]$/";
+            $dni_validate = strtoupper($dni);
+            if(preg_match($pattern, $dni_validate)) {
+              $number = substr($dni_validate, 0, -1);
+              $number = str_replace('X', 0, $number);
+              $number = str_replace('Y', 1, $number);
+              $number = str_replace('Z', 2, $number);
+              $dni_validate = substr($dni_validate, -1, 1);
+              $start = $number % 23;
+              $letter = 'TRWAGMYFPDXBNJZSQVHLCKET';
+              $letter = substr('TRWAGMYFPDXBNJZSQVHLCKET', $start, 1);
+              if($letter == $dni_validate) {
+                $dni_ok = true;
+              }
+            }
+        } catch (Exception $ex) {
+            error_log($ex);
+        }
+        if (!$dni_ok) {
+            error_log('-----------------ingreso a mostrar...');
+            $rules['DNI_']='required';
+            $messages['DNI_.required'] = 'DNI incorrecto, ingrese un número válido, ejemplo: 73547889F';
+        }
 
         $rules['email']='required|email|unique:users';
         $messages['email.required'] = 'Email requerido';
@@ -173,23 +190,6 @@ class AuthorizationController extends Controller
         return Validator::make($request->all(), $rules, $messages);
     }
     
-    public function validateDNI($request){
-        $rules = [];
-        $messages = [];
-        $dni = $request->input('DNI');
-        $letter = substr($dni, -1);
-        $numbers = substr($dni, 0, -1);
-        if (substr("TRWAGMYFPDXBNJZSQVHLCKE", $numbers%23, 1)
-             == $letter && strlen($letter) == 1 && strlen ($numbers) == 8 ){
-                //ok
-        } else{
-            $rules['DNI']='min:900';
-                $messages['DNI.min'] =
-                'DNI incorrecto, ingrese un número válido, ejemplo: 73547889F';
-        }
-        return Validator::make($request->all(), $rules, $messages);
-    }
-
     /**
      * Write code on Method
      *
