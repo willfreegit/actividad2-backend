@@ -77,29 +77,45 @@ class AuthorizationController extends Controller
         $messages = [];
 
         $rules['usr_name']='required|min:2|max:20';
-        $messages['usr_name.required'] = 'El campo nombre es obligatorio';
-        $messages['usr_name.min'] = 'El campo nombre debe tener por lo menos dos caracteres';
+        $messages['usr_name.required'] = 'Nombre requerido';
+        $messages['usr_name.min'] = 'Nombre debe tener por lo menos 2 caracteres';
+        $messages['usr_name.max'] = 'Nombre debe tener máximo 20 caracteres';
 
         $rules['usr_lastname']='required|min:2|max:40';
-        $messages['usr_lastname.required'] = 'El campo apellido es obligatorio';
+        $messages['usr_lastname.required'] = 'Apellido requerido';
+        $messages['usr_lastname.min'] = 'Apellido debe tener por lo menos 2 caracteres';
+        $messages['usr_lastname.max'] = 'Apellido debe tener máximo 40 caracteres';
 
         $rules['usr_DNI']='required|min:8|max:8';
-        $messages['usr_DNI.required'] = 'El campo DNI es obligatorio';
+        $messages['usr_DNI.required'] = 'DNI requerido';
+        $messages['usr_DNI.min'] = 'DNI debe ser de tamaño fijo 8 caracteres';
+        $messages['usr_DNI.max'] = 'DNI debe ser de tamaño fijo 8 caracteres';
 
         $rules['usr_email']='required|email|unique:users';
-        $messages['usr_email.required'] = 'Campo email incorrecto';
+        $messages['usr_email.required'] = 'Email requerido';
+        $messages['usr_email.email'] = 'Email con formato incorrecto';
+        $messages['usr_email.unique'] = 'Esta dirección email ya ha sido registrada';
 
-        $rules['usr_password']='required|confirmed|min:6';
-        $messages['usr_password.required'] = 'El campo password es obligatorio';
+        $rules['usr_password']='required|min:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%@.]).*$/';
+        $messages['usr_password.required'] = 'Constraseña requerida';
+        $messages['usr_password.min'] = 'El tamaño mínimo de la contraseña 8 caracteres';
+        $messages['usr_password.regex'] = 'La contraseña debe contener: letras mayusculas y minusculas, por lo menos un número y uno de los caracteres especiales !$#%@.';
 
-        $rules['usr_password_confirm']='required_with:password|same:password|min:6';
-        $messages['usr_password_confirm.required'] = 'El campo confirmar password es obligatorio';
+        $rules['usr_password_confirm']='required_with:usr_password|same:usr_password';
+        $messages['usr_password_confirm.required'] = 'Confirmar contraseña requerido';
+        $messages['usr_password_confirm.same'] = 'Las contraseñas no coinciden';
 
         $rules['usr_phone']='min:9|max:12';
-        $messages['usr_phone.required'] = 'El campo telefono debe tener mínimo 8 y máximo 12 caracteres';
+        $messages['usr_phone.min'] = 'Telefono debe tener por lo menos 9 caracteres';
+        $messages['usr_phone.max'] = 'Telefono debe tener máximo 12 caracteres';
+
+        $rules['usr_country']='min:2|max:100';
+        $messages['usr_country.min'] = 'País debe tener mínimo 2 caracteres';
+        $messages['usr_country.max'] = 'País debe tener máximo 100 caracteres';
 
         $rules['user_about']='min:20|max:250';
-        $messages['user_about.required'] = 'El campo telefono debe tener mínimo 20 y máximo 250 caracteres';
+        $messages['user_about.min'] = 'La información debe tener mínimo 20 caracteres';
+        $messages['user_about.max'] = 'La información debe tener máximo 250 caracteres';
 
         return Validator::make($request->all(), $rules, $messages);
     }
