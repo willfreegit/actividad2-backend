@@ -116,6 +116,10 @@
                                     @if ($errors->has('IBAN'))
                                         <span class="text-danger">{{ $errors->first('IBAN') }}</span>
                                     @endif
+                                    @if ($errors->has('IBAN_'))
+                                        <span class="text-danger">{{ $errors->first('IBAN_') }}</span>
+                                    @endif
+
                                 </div>
                             </div>
                             <div class="form-group row">

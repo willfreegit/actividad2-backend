@@ -183,14 +183,42 @@ class AuthorizationController extends Controller
         $rules['IBAN']='required';
         $messages['IBAN.required'] = 'IBAN es requerido';
 
+        $rules['IBAN']='required|min:24|max:32';
+        $messages['IBAN.required'] = 'IBAN requerido';
+        $messages['IBAN.min'] = 'IBAN debe ser de tamaño 24 caracteres mínimo';
+        $messages['IBAN.max'] = 'IBAN debe ser de tamaño 32 caracteres máximo';
+        
+        $iban_ok = false;
+        $iban_mensaje='';
+        $iban = $request->input('IBAN');
+        //dump($iban);
+        try{
+            $iban_mensaje= (new Iban())->checkIban($iban);
+          //  dump($iban_mensaje);  
+            if($iban_mensaje=== '') {
+                $iban_ok = true;
+              }
+            //  dump($iban_ok);
+            }
+         catch (Exception $ex) {
+            error_log($ex);
+        }
+        if (!$iban_ok) {
+            $rules['IBAN_']='required';
+            $messages['IBAN_.required'] = $iban_mensaje;
+        }
+        //dump($rules);
+        //dump($messages);
         //AQUI HAY QUE LLAMAR A TU METODO Y ADJUNTAR LA REGLA
         //MAS O MENOS COMO ESTA DEL DNI MAS ARRIBITA PARA QUE RETORNE TODOS LOS ERRORES JUNTOS...
 
         $rules['about']='nullable|min:20|max:250';
         $messages['about.min'] = 'La información debe tener mínimo 20 caracteres';
         $messages['about.max'] = 'La información debe tener máximo 250 caracteres';
-
+        //dump($rules);
+        //dd($messages);
         return Validator::make($request->all(), $rules, $messages);
+        
     }
     
     /**

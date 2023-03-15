@@ -2,9 +2,7 @@
 
 namespace App\Utils;
 
-use Illuminate\Contracts\Validation\Rule;
-
-class Iban2 implements Rule
+class Iban
 {
     /**
      * Create a new rule instance.
@@ -15,20 +13,18 @@ class Iban2 implements Rule
     {
         //
     }
-
-    /**
+ /**
      * Determine if the validation rule passes.
      *
-     * @param  string  $attribute
      * @param  mixed  $value
-     * @return bool
      */
-    public function passes($attribute, $value)
-    {
-
+    public function  checkIban($value)
+    { 
 		/*Logica de la funcion*/
         //Si la bandera se mantiene en cero se devuelve un error en $fail caso contrario no devuelve nada
         $bandera_error=0;
+	    /*Variable para concaternar los mensajes de error de todos los segmentos*/
+        $mensaje_error='';
         /* primer paso es limpiar el valor ingresado de espacios en blanco*/
         $iban =$value;
         $iban = str_replace(' ', '', $iban);
@@ -36,16 +32,15 @@ class Iban2 implements Rule
         //echo $iban;
         /*se chequea que el string resultante sea del valor pedido antes de dividirlo*/
         if(strlen($iban)!=24) {
-            return false;
-            //no continua con la validacion por no ser de la longitud necesaria    
-            }
-            
+            $bandera_error=1;
+            $mensaje_error='El Iban no cumple con su longitud de 24'; }
+            //no continua con la validacion por no ser de la longitud necesaria
         else{
             //Se divide el string en sus partes para verificacion
 
             //2 letras del código ISO del país ES
             $str_pais= strtoupper(substr($iban,0,2));
-            //Se revisa si el substring contiene todas letras y es ES
+            //Se revisa si el substring contiene todas letras
             if (ctype_alpha($str_pais))
             {
                 if ($str_pais!=='ES'){
@@ -57,8 +52,12 @@ class Iban2 implements Rule
             }
 
             if ($bandera_error>0){
-            return false;            
-                                }
+                
+                if ($mensaje_error===''){
+                    $mensaje_error='El Iban no cumple con el código ISO del país ES'; }
+                else{
+                    $mensaje_error .= '. El Iban no cumple con el código ISO del país ES'; }
+            }
 
 
             //2 números de control IBAN
@@ -68,7 +67,10 @@ class Iban2 implements Rule
             {
 
                 $bandera_error=+1;
-                return false;            
+                if ($mensaje_error===''){
+                    $mensaje_error='El Iban no cumple con los números de control IBAN'; }
+                else{
+                    $mensaje_error .= '. El Iban no cumple con los números de control IBAN'; }
             }
 
             //4 números código del banco
@@ -77,7 +79,10 @@ class Iban2 implements Rule
             if(!preg_match('/^[0123456789]+$/',$str_banco)) 
             {
                 $bandera_error=+1;
-                return false;            
+                if ($mensaje_error===''){
+                    $mensaje_error='El Iban no cumple con los números de código del banco'; }
+                else{
+                    $mensaje_error .= '. El Iban no cumple con los números de código del banco'; }
             }           
 
             //4 números código sucursal del banco
@@ -86,7 +91,10 @@ class Iban2 implements Rule
             if(!preg_match('/^[0123456789]+$/',$str_sucursal)) 
             {
                 $bandera_error=+1;
-                return false;            
+                if ($mensaje_error===''){
+                    $mensaje_error='El Iban no cumple con los números de código de la sucursal del banco'; }
+                else{
+                    $mensaje_error .= '. El Iban no cumple con los números de código de la sucursal del banco'; }
             }           
 
 
@@ -95,7 +103,10 @@ class Iban2 implements Rule
             if(!preg_match('/^[0123456789]+$/',$str_control)) 
             {
                 $bandera_error=+1;
-                return false;            
+                if ($mensaje_error===''){
+                    $mensaje_error='El Iban no cumple con los números del dígito de control'; }
+                else{
+                    $mensaje_error .= '. El Iban no cumple con los números del dígito de control'; }
             }           
 
             //10 números número de cuenta
@@ -103,24 +114,15 @@ class Iban2 implements Rule
             if(!preg_match('/^[0123456789]+$/',$str_cuenta)) 
             {
                 $bandera_error=+1;
-                return false;            
+                if ($mensaje_error===''){
+                    $mensaje_error='El Iban no cumple con los números de la cuenta'; }
+                else{
+                    $mensaje_error .= '. El Iban no cumple con los números de la cuenta'; }
             }           
             
         }
         //echo $mensaje_error;
-        //si existio algun error durante la validacion envia false
-        if ($bandera_error>0) {return false;}
-        else {return true;}
-    }
-
-
-    /**
-     * Get the validation error message.
-     *
-     * @return string
-     */
-    public function message()
-    {
-        return 'El Iban no cumple con la validación.';
+        //si existio algun error durante la validacion envia el mismo a traves del $fail
+        if ($bandera_error>0) {return  $mensaje_error.= '.';}
     }
 }
