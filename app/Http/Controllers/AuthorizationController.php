@@ -39,20 +39,38 @@ class AuthorizationController extends Controller
      */
     public function postLogin(Request $request)
     {
-        $request->validate([
-            'email' => 'required',
-            'password' => 'required',
-        ]);
-   
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
-            return redirect()->intended('dashboard')
-                        ->withSuccess('You have Successfully loggedin');
+        $validator = $this->validateLogin($request);
+        if($validator->fails()) {
+            return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
         }
-  
-        return redirect("login")->withSuccess('Oppes! You have entered invalid credentials');
+        error_log('----------->1');
+        $email = 
+        $credentials = $request->only('email', 'password');
+        error_log('----------->2');
+        if (Auth::attempt($credentials)) {
+            error_log('----------->3');
+            return back()->with('message', 'Credenciales correctas!!!');
+        }
+        error_log('----------->4');
+        return back()->with('message', 'Credenciales incorrectas!!!');
+
     }
       
+    private function validateLogin($request){
+        $rules = [];
+        $messages = [];
+
+        $rules['email']='required|email';
+        $messages['email.required'] = 'Email requerido';
+        $messages['email.email'] = 'Email con formato incorrecto';
+
+        $rules['password']='required';
+        $messages['password.required'] = 'Contraseña requerida';
+
+        return Validator::make($request->all(), $rules, $messages);
+    }
     /**
      * Write code on Method
      *
@@ -76,46 +94,46 @@ class AuthorizationController extends Controller
         $rules = [];
         $messages = [];
 
-        $rules['usr_name']='required|min:2|max:20';
-        $messages['usr_name.required'] = 'Nombre requerido';
-        $messages['usr_name.min'] = 'Nombre debe tener por lo menos 2 caracteres';
-        $messages['usr_name.max'] = 'Nombre debe tener máximo 20 caracteres';
+        $rules['name']='required|min:2|max:20';
+        $messages['name.required'] = 'Nombre requerido';
+        $messages['name.min'] = 'Nombre debe tener por lo menos 2 caracteres';
+        $messages['name.max'] = 'Nombre debe tener máximo 20 caracteres';
 
-        $rules['usr_lastname']='required|min:2|max:40';
-        $messages['usr_lastname.required'] = 'Apellido requerido';
-        $messages['usr_lastname.min'] = 'Apellido debe tener por lo menos 2 caracteres';
-        $messages['usr_lastname.max'] = 'Apellido debe tener máximo 40 caracteres';
+        $rules['lastname']='required|min:2|max:40';
+        $messages['lastname.required'] = 'Apellido requerido';
+        $messages['lastname.min'] = 'Apellido debe tener por lo menos 2 caracteres';
+        $messages['lastname.max'] = 'Apellido debe tener máximo 40 caracteres';
 
-        $rules['usr_DNI']='required|min:8|max:8';
-        $messages['usr_DNI.required'] = 'DNI requerido';
-        $messages['usr_DNI.min'] = 'DNI debe ser de tamaño fijo 8 caracteres';
-        $messages['usr_DNI.max'] = 'DNI debe ser de tamaño fijo 8 caracteres';
+        $rules['DNI']='required|min:8|max:8';
+        $messages['DNI.required'] = 'DNI requerido';
+        $messages['DNI.min'] = 'DNI debe ser de tamaño fijo 8 caracteres';
+        $messages['DNI.max'] = 'DNI debe ser de tamaño fijo 8 caracteres';
 
-        $rules['usr_email']='required|email|unique:users';
-        $messages['usr_email.required'] = 'Email requerido';
-        $messages['usr_email.email'] = 'Email con formato incorrecto';
-        $messages['usr_email.unique'] = 'Esta dirección email ya ha sido registrada';
+        $rules['email']='required|email|unique:users';
+        $messages['email.required'] = 'Email requerido';
+        $messages['email.email'] = 'Email con formato incorrecto';
+        $messages['email.unique'] = 'Esta dirección email ya ha sido registrada';
 
-        $rules['usr_password']='required|min:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%@.]).*$/';
-        $messages['usr_password.required'] = 'Constraseña requerida';
-        $messages['usr_password.min'] = 'El tamaño mínimo de la contraseña 8 caracteres';
-        $messages['usr_password.regex'] = 'La contraseña debe contener: letras mayusculas y minusculas, por lo menos un número y uno de los caracteres especiales !$#%@.';
+        $rules['password']='required|min:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%@.]).*$/';
+        $messages['password.required'] = 'Contraseña requerida';
+        $messages['password.min'] = 'El tamaño mínimo de la contraseña 8 caracteres';
+        $messages['password.regex'] = 'La contraseña debe contener: letras mayusculas y minusculas, por lo menos un número y uno de los caracteres especiales !$#%@.';
 
-        $rules['usr_password_confirm']='required_with:usr_password|same:usr_password';
-        $messages['usr_password_confirm.required'] = 'Confirmar contraseña requerido';
-        $messages['usr_password_confirm.same'] = 'Las contraseñas no coinciden';
+        $rules['password_confirm']='required_with:password|same:password';
+        $messages['password_confirm.required'] = 'Confirmar contraseña requerido';
+        $messages['password_confirm.same'] = 'Las contraseñas no coinciden';
 
-        $rules['usr_phone']='min:9|max:12';
-        $messages['usr_phone.min'] = 'Telefono debe tener por lo menos 9 caracteres';
-        $messages['usr_phone.max'] = 'Telefono debe tener máximo 12 caracteres';
+        $rules['phone']='min:9|max:12';
+        $messages['phone.min'] = 'Telefono debe tener por lo menos 9 caracteres';
+        $messages['phone.max'] = 'Telefono debe tener máximo 12 caracteres';
 
-        $rules['usr_country']='min:2|max:100';
-        $messages['usr_country.min'] = 'País debe tener mínimo 2 caracteres';
-        $messages['usr_country.max'] = 'País debe tener máximo 100 caracteres';
+        $rules['country']='min:2|max:100';
+        $messages['country.min'] = 'País debe tener mínimo 2 caracteres';
+        $messages['country.max'] = 'País debe tener máximo 100 caracteres';
 
-        $rules['user_about']='min:20|max:250';
-        $messages['user_about.min'] = 'La información debe tener mínimo 20 caracteres';
-        $messages['user_about.max'] = 'La información debe tener máximo 250 caracteres';
+        $rules['about']='min:20|max:250';
+        $messages['about.min'] = 'La información debe tener mínimo 20 caracteres';
+        $messages['about.max'] = 'La información debe tener máximo 250 caracteres';
 
         return Validator::make($request->all(), $rules, $messages);
     }
@@ -142,15 +160,15 @@ class AuthorizationController extends Controller
     public function create(array $data)
     {
       return User::create([
-        'usr_name' => $data['usr_name'],
-        'usr_lastname' => $data['usr_lastname'],
-        'usr_DNI' => $data['usr_DNI'],
-        'usr_email' => $data['usr_email'],
-        'usr_phone' => $data['usr_phone'],
-        'usr_country' => $data['usr_country'],
-        'usr_IBAN' => $data['usr_IBAN'],
-        'user_about' => $data['user_about'],
-        'usr_password' => Hash::make($data['usr_password'])
+        'name' => $data['name'],
+        'lastname' => $data['lastname'],
+        'DNI' => $data['DNI'],
+        'email' => $data['email'],
+        'phone' => $data['phone'],
+        'country' => $data['country'],
+        'IBAN' => $data['IBAN'],
+        'about' => $data['about'],
+        'password' => Hash::make($data['password'])
       ]);
     }
     
