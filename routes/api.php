@@ -12,6 +12,7 @@ use App\Http\Controllers\JobHistoryController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RulesController;
 use App\Http\Controllers\VacationsController;
+use App\Http\Controllers\AuthorizationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,11 @@ use App\Http\Controllers\VacationsController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::controller(AuthorizationController::class)->prefix('auth')->group(function(){
+    Route::post('/postLogin', 'postLoginApi');
+    Route::post('/postRegistration', 'postRegistration');
+});
 
 Route::controller(AbsenceController::class)->prefix('absences')->group(function(){
     Route::get('/', 'index');

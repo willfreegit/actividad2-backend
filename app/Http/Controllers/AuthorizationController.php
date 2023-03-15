@@ -45,16 +45,32 @@ class AuthorizationController extends Controller
             ->withErrors($validator)
             ->withInput();
         }
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            return back()->with('message', 'Credenciales correctas!!!');
+        }
+        return back()->with('message', 'Credenciales incorrectas!!!');
+
+    }
+
+    public function postLoginApi(Request $request)
+    {
+        error_log('----------->0');
+        $validator = $this->validateLogin($request);
+        error_log('----------->0.5');
+        if($validator->fails()) {
+            error_log('----------->0.666');
+            return response()->json($validator->messages(), 200);
+        }
         error_log('----------->1');
-        $email = 
         $credentials = $request->only('email', 'password');
         error_log('----------->2');
         if (Auth::attempt($credentials)) {
             error_log('----------->3');
-            return back()->with('message', 'Credenciales correctas!!!');
+            return response()->json('Credenciales correctas', 200);
         }
         error_log('----------->4');
-        return back()->with('message', 'Credenciales incorrectas!!!');
+        return response()->json('Credenciales incorrectas', 200);
 
     }
       
