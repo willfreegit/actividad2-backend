@@ -27,7 +27,7 @@ use App\Http\Controllers\AuthorizationController;
 
 Route::controller(AuthorizationController::class)->prefix('auth')->group(function(){
     Route::post('/postLogin', 'postLoginApi');
-    Route::post('/postRegistration', 'postRegistration');
+    Route::post('/postRegistration', 'postRegistrationApi');
 });
 
 Route::controller(AbsenceController::class)->prefix('absences')->group(function(){

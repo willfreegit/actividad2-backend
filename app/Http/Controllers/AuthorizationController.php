@@ -55,21 +55,14 @@ class AuthorizationController extends Controller
 
     public function postLoginApi(Request $request)
     {
-        error_log('----------->0');
         $validator = $this->validateLogin($request);
-        error_log('----------->0.5');
         if($validator->fails()) {
-            error_log('----------->0.666');
             return response()->json($validator->messages(), 200);
         }
-        error_log('----------->1');
         $credentials = $request->only('email', 'password');
-        error_log('----------->2');
         if (Auth::attempt($credentials)) {
-            error_log('----------->3');
             return response()->json('Credenciales correctas', 200);
         }
-        error_log('----------->4');
         return response()->json('Credenciales incorrectas', 200);
 
     }
@@ -100,10 +93,32 @@ class AuthorizationController extends Controller
             ->withErrors($validator)
             ->withInput();
         }
+        $validatorDNI = $this->validateDNI($request);
+        if($validatorDNI->fails()) {
+            return redirect()->back()
+            ->withErrors($validatorDNI)
+            ->withInput();
+        }
         $data = $request->all();
         $this->create($data);
          
         return redirect("dashboard")->withSuccess('Great! You have Successfully loggedin');
+    }
+
+    public function postRegistrationApi(Request $request)
+    {
+        $validator = $this->validateRegister($request);
+        if($validator->fails()) {
+            return response()->json($validator->messages(), 200);
+        }
+        $validatorDNI = $this->validateDNI($request);
+        if($validatorDNI->fails()) {
+            return response()->json($validatorDNI->messages(), 200);
+        }
+        $data = $request->all();
+        $this->create($data);
+         
+        return response()->json('Registro completo', 200);
     }
 
     private function validateRegister($request){
@@ -120,10 +135,10 @@ class AuthorizationController extends Controller
         $messages['lastname.min'] = 'Apellido debe tener por lo menos 2 caracteres';
         $messages['lastname.max'] = 'Apellido debe tener máximo 40 caracteres';
 
-        $rules['DNI']='required|min:8|max:8';
+        $rules['DNI']='required|min:9|max:9';
         $messages['DNI.required'] = 'DNI requerido';
-        $messages['DNI.min'] = 'DNI debe ser de tamaño fijo 8 caracteres';
-        $messages['DNI.max'] = 'DNI debe ser de tamaño fijo 8 caracteres';
+        $messages['DNI.min'] = 'DNI debe ser de tamaño 9 caracteres';
+        $messages['DNI.max'] = 'DNI debe ser de tamaño 9 caracteres';
 
         $rules['email']='required|email|unique:users';
         $messages['email.required'] = 'Email requerido';
@@ -133,7 +148,8 @@ class AuthorizationController extends Controller
         $rules['password']='required|min:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%@.]).*$/';
         $messages['password.required'] = 'Contraseña requerida';
         $messages['password.min'] = 'El tamaño mínimo de la contraseña 8 caracteres';
-        $messages['password.regex'] = 'La contraseña debe contener: letras mayusculas y minusculas, por lo menos un número y uno de los caracteres especiales !$#%@.';
+        $messages['password.regex'] =
+        'La contraseña debe tener letras mayusculas y minusculas, números y algún caracter especial: !$#%@.';
 
         $rules['password_confirm']='required_with:password|same:password';
         $messages['password_confirm.required'] = 'Confirmar contraseña requerido';
@@ -147,6 +163,9 @@ class AuthorizationController extends Controller
         $messages['country.min'] = 'País debe tener mínimo 2 caracteres';
         $messages['country.max'] = 'País debe tener máximo 100 caracteres';
 
+        $rules['IBAN']='required';
+        $messages['IBAN.required'] = 'IBAN es requerido';
+
         $rules['about']='min:20|max:250';
         $messages['about.min'] = 'La información debe tener mínimo 20 caracteres';
         $messages['about.max'] = 'La información debe tener máximo 250 caracteres';
@@ -154,6 +173,23 @@ class AuthorizationController extends Controller
         return Validator::make($request->all(), $rules, $messages);
     }
     
+    public function validateDNI($request){
+        $rules = [];
+        $messages = [];
+        $dni = $request->input('DNI');
+        $letter = substr($dni, -1);
+        $numbers = substr($dni, 0, -1);
+        if (substr("TRWAGMYFPDXBNJZSQVHLCKE", $numbers%23, 1)
+             == $letter && strlen($letter) == 1 && strlen ($numbers) == 8 ){
+                //ok
+        } else{
+            $rules['DNI']='min:900';
+                $messages['DNI.min'] =
+                'DNI incorrecto, ingrese un número válido, ejemplo: 73547889F';
+        }
+        return Validator::make($request->all(), $rules, $messages);
+    }
+
     /**
      * Write code on Method
      *
@@ -180,10 +216,10 @@ class AuthorizationController extends Controller
         'lastname' => $data['lastname'],
         'DNI' => $data['DNI'],
         'email' => $data['email'],
-        'phone' => $data['phone'],
-        'country' => $data['country'],
+        'phone' => isset($data['phone']) ? $data['phone'] : null,
+        'country' => isset($data['country']) ? $data['country'] : null,
         'IBAN' => $data['IBAN'],
-        'about' => $data['about'],
+        'about' => isset($data['about']) ? $data['about'] : null,
         'password' => Hash::make($data['password'])
       ]);
     }
