@@ -42,6 +42,9 @@
                                     @if ($errors->has('DNI'))
                                         <span class="text-danger">{{ $errors->first('DNI') }}</span>
                                     @endif
+                                    @if ($errors->has('DNI_'))
+                                        <span class="text-danger">{{ $errors->first('DNI_') }}</span>
+                                    @endif
                                 </div>
                             </div>
                             <div class="form-group row">

@@ -9,6 +9,7 @@ use Session;
 use App\Models\User;
 use Hash;
 use Validator;
+use App\Utils\Iban;
   
 class AuthorizationController extends Controller
 {
@@ -152,7 +153,6 @@ class AuthorizationController extends Controller
             error_log($ex);
         }
         if (!$dni_ok) {
-            error_log('-----------------ingreso a mostrar...');
             $rules['DNI_']='required';
             $messages['DNI_.required'] = 'DNI incorrecto, ingrese un número válido, ejemplo: 73547889F';
         }
@@ -162,28 +162,31 @@ class AuthorizationController extends Controller
         $messages['email.email'] = 'Email con formato incorrecto';
         $messages['email.unique'] = 'Esta dirección email ya ha sido registrada';
 
-        $rules['password']='required|min:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%@.]).*$/';
+        $rules['password']='required|min:8|regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%@.?]).*$/';
         $messages['password.required'] = 'Contraseña requerida';
         $messages['password.min'] = 'El tamaño mínimo de la contraseña 8 caracteres';
         $messages['password.regex'] =
-        'La contraseña debe tener letras mayusculas y minusculas, números y algún caracter especial: !$#%@.';
+        'La contraseña debe tener letras mayusculas y minusculas, números y algún caracter especial: !$#%@.?';
 
         $rules['password_confirm']='required_with:password|same:password';
         $messages['password_confirm.required'] = 'Confirmar contraseña requerido';
         $messages['password_confirm.same'] = 'Las contraseñas no coinciden';
 
-        $rules['phone']='min:9|max:12';
+        $rules['phone']='nullable|min:9|max:12';
         $messages['phone.min'] = 'Telefono debe tener por lo menos 9 caracteres';
         $messages['phone.max'] = 'Telefono debe tener máximo 12 caracteres';
 
-        $rules['country']='min:2|max:100';
+        $rules['country']='nullable|min:2|max:100';
         $messages['country.min'] = 'País debe tener mínimo 2 caracteres';
         $messages['country.max'] = 'País debe tener máximo 100 caracteres';
 
         $rules['IBAN']='required';
         $messages['IBAN.required'] = 'IBAN es requerido';
 
-        $rules['about']='min:20|max:250';
+        //AQUI HAY QUE LLAMAR A TU METODO Y ADJUNTAR LA REGLA
+        //MAS O MENOS COMO ESTA DEL DNI MAS ARRIBITA PARA QUE RETORNE TODOS LOS ERRORES JUNTOS...
+
+        $rules['about']='nullable|min:20|max:250';
         $messages['about.min'] = 'La información debe tener mínimo 20 caracteres';
         $messages['about.max'] = 'La información debe tener máximo 250 caracteres';
 
