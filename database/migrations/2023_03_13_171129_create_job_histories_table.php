@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('job_histories', function (Blueprint $table) {
             $table->unsignedBigInteger('epl_id');
             $table->date('job_entry_date');
-            $table->date('job_exit_date')->nulleable();
+            $table->date('job_exit_date')->nullable();
             $table->primary(array('epl_id', 'job_entry_date'));
             $table->foreign('epl_id')->references('epl_id')->on('employees');
             $table->timestamps();

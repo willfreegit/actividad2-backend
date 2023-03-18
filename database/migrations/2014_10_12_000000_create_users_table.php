@@ -20,10 +20,10 @@ return new class extends Migration
             $table->string('DNI', 9);
             $table->string('email', 191)->unique();
             $table->string('password', 191);
-            $table->string('phone', 12)->Nulleable();
-            $table->string('country', 25)->Nulleable();
+            $table->string('phone', 12)->nullable();
+            $table->string('country', 25)->nullable();
             $table->string('IBAN', 24);
-            $table->string('about', 250)->Nulleable();
+            $table->string('about', 250)->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -195,7 +195,7 @@ class AuthorizationController extends Controller
         try{
             $iban_mensaje= (new Iban())->checkIban($iban);
           //  dump($iban_mensaje);  
-            if($iban_mensaje=== '') {
+            if(!$iban_mensaje || $iban_mensaje=== '' || $iban_mensaje=== '.') {
                 $iban_ok = true;
               }
             //  dump($iban_ok);
