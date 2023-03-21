@@ -16,7 +16,7 @@ class AbsenceController extends Controller
      */
     public function index()
     {
-        $absences = Absence::all();
+        $absences = Absence::paginate(5);
         $resultResponse = new ResultResponse();
         $resultResponse->setData($absences);
         $resultResponse->setStatusCode(ResultResponse::SUCCESS_CODE);
@@ -56,6 +56,7 @@ class AbsenceController extends Controller
             $resultResponse->setStatusCode(ResultResponse::SUCCESS_CODE);
             $resultResponse->setMessage(ResultResponse::TXT_SUCCESS_CODE);
         } catch(\Exception $ex){
+            error_log($ex);
             $resultResponse->setStatusCode(ResultResponse::ERROR_CODE);
             $resultResponse->setMessage($ex);
         }
@@ -102,10 +103,47 @@ class AbsenceController extends Controller
      * @param  \App\Models\Absence  $absence
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Absence $absence)
+    public function update(Request $request, $id)
     {
-        //
+        $this -> validateAbsence($request);
+        $resultResponse = new ResultResponse();
+        try{
+            $absence = Absence::findOrFail($id);
+            $absence->abs_description = $request->get('abs_description');
+            $absence->abs_referable = $request->get('abs_referable');
+    
+            $absence->save();
+    
+            $resultResponse->setData($absence);
+            $resultResponse->setStatusCode(ResultResponse::SUCCESS_CODE);
+            $resultResponse->setStatusCode(ResultResponse::TXT_SUCCESS_CODE);
+        } catch(\Exception $ex){
+            $resultResponse->setStatusCode(ResultResponse::ERROR_ELEMENT_NOT_FOUND_CODE);
+            $resultResponse->setStatusCode(ResultResponse::TXT_ERROR_ELEMENT_NOT_FOUND_CODE);
+        }
     }
+
+    public function put(Request $request, $id)
+    {
+        error_log('ingresa a actualizar');
+        $resultResponse = new ResultResponse();
+        try{
+            $absence = Absence::where('abs_id',  $id)->firstOrFail();
+            $absence->abs_description = $request->get('abs_description');
+            $absence->abs_referable = $request->get('abs_referable');
+    
+            $absence->save();
+    
+            $resultResponse->setData($absence);
+            $resultResponse->setStatusCode(ResultResponse::SUCCESS_CODE);
+            $resultResponse->setStatusCode(ResultResponse::TXT_SUCCESS_CODE);
+        } catch(\Exception $ex){
+            error_log($ex);
+            $resultResponse->setStatusCode(ResultResponse::ERROR_ELEMENT_NOT_FOUND_CODE);
+            $resultResponse->setStatusCode(ResultResponse::TXT_ERROR_ELEMENT_NOT_FOUND_CODE);
+        }
+    }
+
 
     /**
      * Remove the specified resource from storage.
@@ -113,8 +151,19 @@ class AbsenceController extends Controller
      * @param  \App\Models\Absence  $absence
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Absence $absence)
+    public function destroy($id)
     {
-        //
+        $resultResponse = new ResultResponse();
+        try{
+            $absence = Absence::findOrFail($id);
+            $absence->delete();
+    
+            $resultResponse->setData($absence);
+            $resultResponse->setStatusCode(ResultResponse::SUCCESS_CODE);
+            $resultResponse->setStatusCode(ResultResponse::TXT_SUCCESS_CODE);
+        } catch(\Exception $ex){
+            $resultResponse->setStatusCode(ResultResponse::ERROR_ELEMENT_NOT_FOUND_CODE);
+            $resultResponse->setStatusCode(ResultResponse::TXT_ERROR_ELEMENT_NOT_FOUND_CODE);
+        }
     }
 }
