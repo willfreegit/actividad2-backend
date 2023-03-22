@@ -166,6 +166,10 @@ class EmployeeController extends Controller
 
     public function put(Request $request, $id)
     {
+        $validator = $this->validateEmployee($request);
+        if($validator->fails()) {
+            return response()->json($validator->messages(), 200);
+        }
         $resultResponse = new ResultResponse();
         try{
             $employee = Employee::where('epl_id',  $id)->firstOrFail();

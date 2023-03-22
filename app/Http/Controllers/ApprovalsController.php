@@ -51,7 +51,6 @@ class ApprovalsController extends Controller
         try{
             $newApprovals = new Approvals(
                 [
-                    'req_id'=>$request->get('req_id'),
                     'epl_approval_id'=>$request->get('epl_approval_id'),
                     'aut_sequential_approval_flow'=>$request->get('aut_sequential_approval_flow'),
                     'aut_submission_date_for_approval'=>$request->get('aut_submission_date_for_approval'),
@@ -75,9 +74,7 @@ class ApprovalsController extends Controller
     private function validateApprovals($request){
         $rules = [];
         $messages = [];
-        $rules['req_id']='required|exists:requests,req_id';
-        $messages['req_id.exists'] = 'La solicitud no existe';
-        $rules['epl_approval_id']='required|exists:employees,epl_id';
+     /*   $rules['epl_approval_id']='required|exists:employees,epl_id';
         $messages['epl_approval_id.exists'] = 'El empleado no existe';
         $rules['aut_sequential_approval_flow']='required';
         $messages['aut_sequential_approval_flow.required'] =
@@ -87,7 +84,7 @@ class ApprovalsController extends Controller
         'La fecha de ingreso es obligatoria';
         $rules['aut_action']='required|max:20';
         $messages['aut_action.required'] = 'Accion es obligatoria';
-        $messages['aut_action.max'] = 'La accion debe tener como máximo 10 caracteres';
+        $messages['aut_action.max'] = 'La accion debe tener como máximo 10 caracteres';*/
         return Validator::make($request->all(), $rules, $messages);
     }
 
