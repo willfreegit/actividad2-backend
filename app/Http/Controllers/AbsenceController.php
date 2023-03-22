@@ -42,7 +42,10 @@ class AbsenceController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validateAbsence($request);
+        $validator = $this->validateAbsence($request);
+        if($validator->fails()) {
+            return response()->json($validator->messages(), 200);
+        }
         $resultResponse = new ResultResponse();
         try{
             $newAbsence = new Absence(
@@ -105,7 +108,10 @@ class AbsenceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this -> validateAbsence($request);
+        $validator = $this->validateAbsence($request);
+        if($validator->fails()) {
+            return response()->json($validator->messages(), 200);
+        }
         $resultResponse = new ResultResponse();
         try{
             $absence = Absence::findOrFail($id);
