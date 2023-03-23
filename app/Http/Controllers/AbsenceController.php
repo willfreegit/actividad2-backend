@@ -131,7 +131,10 @@ class AbsenceController extends Controller
 
     public function put(Request $request, $id)
     {
-        error_log('ingresa a actualizar');
+        $validator = $this->validateAbsence($request);
+        if($validator->fails()) {
+            return response()->json($validator->messages(), 200);
+        }
         $resultResponse = new ResultResponse();
         try{
             $absence = Absence::where('abs_id',  $id)->firstOrFail();
