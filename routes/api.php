@@ -8,7 +8,6 @@ use App\Http\Controllers\BenefitsController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\HolidaysController;
-use App\Http\Controllers\JobHistoryController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RulesController;
 use App\Http\Controllers\VacationsController;
@@ -76,15 +75,6 @@ Route::controller(EmployeeController::class)->prefix('employees')->group(functio
 });
 
 Route::controller(HolidaysController::class)->prefix('holidays')->group(function(){
-    Route::get('/', 'index');
-    Route::post('/', 'store');
-    Route::post('/{id}', 'update');
-    Route::put('/{id}', 'put');
-    Route::get('/{id}', 'show');
-    Route::delete('/{id}', 'destroy');
-});
-
-Route::controller(JobHistoryController::class)->prefix('jobHistory')->group(function(){
     Route::get('/', 'index');
     Route::post('/', 'store');
     Route::post('/{id}', 'update');
